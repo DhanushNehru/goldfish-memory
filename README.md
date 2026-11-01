@@ -2,7 +2,7 @@
 
 **Your coding agent has the memory of a goldfish. Fix that - on-device.**
 
-Coding agents forget everything when the session ends unless they send your code context to someone's cloud. goldfish-memory gives any coding agent persistent, searchable, cross-session memory that lives in a single local SQLite file - the engine makes **no network calls, ever**.
+Coding agents forget everything when the session ends unless they send your code context to someone's cloud. goldfish-memory gives any coding agent persistent, searchable, cross-session memory that lives in a single local SQLite file - the engine ships **no networking code and downloads nothing at runtime**.
 
 ## Demo (30 seconds)
 
@@ -60,14 +60,16 @@ with MemoryEngine() as engine:
 
 ## Why local?
 
-- **Privacy**: your codebase's decisions and bugs never leave the machine. There is nothing to leak - there is no code path that opens a socket.
+- **Privacy**: your codebase's decisions and bugs never leave the machine - the engine ships no networking code, so there is nothing to leak through.
 - **Zero cost**: no API keys, no per-call fees, no quota.
 - **Works anywhere**: planes, trains, air-gapped networks, CI runners.
 - **Yours**: the store is a SQLite file you can copy, back up, grep, or delete.
 
-## Offline guarantee
+## Offline by design, verified in CI
 
-The engine - capture, search, injection, compaction, model initialization, and every bundled adapter - performs no network access. CI proves it two ways: the full test suite runs with Python sockets disabled ([pytest-socket](https://github.com/miketheman/pytest-socket)), and again inside a network namespace with no interfaces at all (`unshare -n`), which blocks native code paths too. The only step that ever needs the network is installing the package itself; the default model is bundled, so there is no provisioning step and no runtime download. (If the bundled weights are deliberately stripped for a lean build, the engine fails fast with instructions instead of downloading.)
+The engine - capture, search, injection, compaction, model initialization, and every bundled adapter - is built with no networking code and never downloads at runtime. The only step that ever needs the network is installing the package itself; the default model is bundled, so there is no provisioning step and no runtime download. (If the bundled weights are deliberately stripped for a lean build, the engine fails fast with instructions instead of downloading.)
+
+CI verifies this on the tested paths: the full test suite runs with Python sockets disabled ([pytest-socket](https://github.com/miketheman/pytest-socket)), and the suite plus a fresh `goldfish demo` also pass inside a Linux network namespace with no external route (`unshare -n`), which blocks native code paths such as ONNX Runtime and the tokenizer too. That is evidence about the shipped implementation and the paths the tests exercise - not a proof about code that does not exist yet.
 
 ## Benchmark
 

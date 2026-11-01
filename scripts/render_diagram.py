@@ -98,9 +98,9 @@ def render(out: Path) -> None:
         (620, 300, 970, 420),
         "offline guarantees",
         [
-            "no network calls - no code",
-            "path opens a socket; CI",
-            "proves it with no network",
+            "no networking code;",
+            "CI: suite + demo pass",
+            "with no network route",
         ],
         fill=(252, 244, 244),
         outline=WARN,
