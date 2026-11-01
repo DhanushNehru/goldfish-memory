@@ -42,11 +42,13 @@ TOPICS = {
 # entries in the store. Each query asks for exactly that fact. This is what
 # real recall looks like; the repetitive filler is just the haystack.
 NEEDLES = {
-    "database": "migration safety rule: always run schema migrations inside a transaction with a tested rollback",
+    "database": "migration safety rule: always run schema migrations "
+    "inside a transaction with a tested rollback",
     "frontend": "mobile layout fix: the sidebar collapses below 768px using the useMediaQuery hook",
     "auth": "refresh tokens live in httpOnly cookies and rotate every 24 hours",
     "deploy": "release pipeline fact: canary deploys go to 5 percent of traffic for 30 minutes",
-    "testing": "flaky test fact: test_checkout_total is order-dependent because of the shared cart fixture",
+    "testing": "flaky test fact: test_checkout_total is order-dependent "
+    "because of the shared cart fixture",
     "billing": "payment retry rule: failed invoices retry at 3, 5, and 7 days before cancellation",
     "cache": "cache expiry fact: session cache entries expire after 900 seconds of idle time",
     "api": "status code rule: the export endpoint returns 202 with a job id while processing",
@@ -88,7 +90,7 @@ def build_store(engine: MemoryEngine, n: int, seed: int = 0) -> dict[str, list[i
     for start in range(0, total, 256):
         chunk = texts[start : start + 256]
         vectors = engine.embedder.embed(chunk)
-        for text, topic, vec in zip(chunk, topics[start : start + 256], vectors):
+        for text, topic, vec in zip(chunk, topics[start : start + 256], vectors, strict=True):
             mid = engine.db.add(Memory(content=text, kind="note"), vec)
             topic_ids[topic].append(mid)
     return topic_ids

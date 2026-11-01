@@ -64,7 +64,9 @@ def render(out: Path) -> None:
     frames: list[Image.Image] = []
     history: list[tuple[str, tuple[int, int, int], ImageFont.FreeTypeFont]] = []
 
-    def frame(lines: list[tuple[str, tuple[int, int, int], ImageFont.FreeTypeFont]], repeat: int = 1) -> None:
+    Line = tuple[str, tuple[int, int, int], ImageFont.FreeTypeFont]
+
+    def frame(lines: list[Line], repeat: int = 1) -> None:
         img = Image.new("RGB", (W, H), BG)
         d = ImageDraw.Draw(img)
         d.rounded_rectangle((0, 0, W - 1, 34), 8, fill=(43, 46, 56))
@@ -85,8 +87,8 @@ def render(out: Path) -> None:
         text = "$ " + cmd
         for i in range(len("$ "), len(text) + 1, 2):
             typed = text[:i]
-            frame(history + [(typed + "▌", PROMPT, font_b)])
-        frame(history + [(text, PROMPT, font_b)], repeat=3)
+            frame([*history, (typed + "▌", PROMPT, font_b)])
+        frame([*history, (text, PROMPT, font_b)], repeat=3)
         history.append(("$ " + cmd, PROMPT, font_b))
         for line in output:
             history.append((line, FG, font))

@@ -47,11 +47,11 @@ The embedding model is bundled; no provisioning, no API keys, works offline.
 ```python
 from goldfish_memory import MemoryEngine
 
-with MemoryEngine() as engine:                     # .goldfish/memory.db by default
+with MemoryEngine() as engine:  # .goldfish/memory.db by default
     engine.capture("Chose X over Y because ...", kind="decision")
     hits = engine.search("why did we pick X?", k=5)
     block = engine.inject("refactor the storage layer", k=6, max_tokens=800)
-    print(block.text)                              # markdown, token-budgeted
+    print(block.text)  # markdown, token-budgeted
 ```
 
 Custom model: pass any `Embedder` implementation, or set `GOLDFISH_MODEL_DIR` to a directory with `model.onnx` + `tokenizer.json`. Models are never downloaded at runtime.

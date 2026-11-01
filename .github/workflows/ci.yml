@@ -77,6 +77,8 @@ jobs:
       # network namespace with no interfaces, so neither Python nor native
       # code (ONNX Runtime, tokenizer) can reach the network.
       - name: full test suite with zero network interfaces
-        run: sudo unshare -n .venv/bin/pytest -q 2>/dev/null || sudo unshare -n python -m pytest -q
+        # pip installed into setup-python's interpreter; use its absolute
+        # path so sudo's PATH reset cannot resolve a different python.
+        run: sudo unshare -n "$(command -v python)" -m pytest -q
       - name: fresh CLI demo with zero network interfaces
-        run: sudo unshare -n python -m goldfish_memory.cli demo || sudo unshare -n "$(command -v goldfish || echo .venv/bin/goldfish)" demo
+        run: sudo unshare -n "$(command -v goldfish)" demo
