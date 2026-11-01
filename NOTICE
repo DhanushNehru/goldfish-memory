@@ -1,0 +1,22 @@
+goldfish-memory bundles third-party components, used under their licenses:
+
+* all-MiniLM-L6-v2 sentence embedding model (quantized ONNX weights +
+  tokenizer), bundled in src/goldfish_memory/_weights/
+  Original model: https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2
+    Revision 1110a243fdf4706b3f48f1d95db1a4f5529b4d41, License: Apache-2.0
+  ONNX export + tokenizer source:
+    https://huggingface.co/Xenova/all-MiniLM-L6-v2
+    Revision 751bff37182d3f1213fa05d7196b954e230abad9, License: Apache-2.0
+  Bundled artifacts (sha256):
+    model.onnx     afdb6f1a0e45b715d0bb9b11772f032c399babd23bfc31fed1c170afc848bdb1
+                   (= onnx/model_quantized.onnx, int8-quantized derivative)
+    tokenizer.json da0e79933b9ed51798a3ae27893d3c5fa4a201126cef75586296df9b4d2c62a0
+  Quantization: int8, performed by the Xenova export, not by this project.
+  Apache-2.0 license text: https://www.apache.org/licenses/LICENSE-2.0
+
+Runtime dependencies (installed by pip, not redistributed here):
+
+* sqlite-vec - MIT / Apache-2.0 - https://github.com/asg017/sqlite-vec
+* ONNX Runtime - MIT - https://github.com/microsoft/onnxruntime
+* tokenizers - Apache-2.0 - https://github.com/huggingface/tokenizers
+* NumPy - BSD-3-Clause - https://numpy.org

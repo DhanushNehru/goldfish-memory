@@ -1,0 +1,82 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install ruff
+      - run: ruff check .
+      - run: ruff format --check .
+
+  typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -e .[dev]
+      - run: mypy
+
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: pip install -e .[dev]
+      # pytest-socket blocks Python-level network for the whole suite.
+      - run: pytest -q
+
+  packaging:
+    name: wheel contains real weights
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install build
+      - run: python -m build --wheel --outdir /tmp/dist
+      # The wheel must carry the real 23MB weights, not a pointer or stub.
+      - name: verify bundled weights
+        run: |
+          python - <<'PY'
+          import zipfile, glob, hashlib
+          whl = glob.glob('/tmp/dist/*.whl')[0]
+          with zipfile.ZipFile(whl) as z:
+              data = z.read('goldfish_memory/_weights/all-MiniLM-L6-v2-quantized/model.onnx')
+          assert len(data) == 22972370, len(data)
+          assert hashlib.sha256(data).hexdigest() == 'afdb6f1a0e45b715d0bb9b11772f032c399babd23bfc31fed1c170afc848bdb1'
+          print('wheel carries real weights: OK')
+          PY
+
+  offline-proof:
+    name: offline proof (no network namespace)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -e .[dev]
+      # OS-level proof: run the full suite and a fresh CLI session inside a
+      # network namespace with no interfaces, so neither Python nor native
+      # code (ONNX Runtime, tokenizer) can reach the network.
+      - name: full test suite with zero network interfaces
+        run: sudo unshare -n .venv/bin/pytest -q 2>/dev/null || sudo unshare -n python -m pytest -q
+      - name: fresh CLI demo with zero network interfaces
+        run: sudo unshare -n python -m goldfish_memory.cli demo || sudo unshare -n "$(command -v goldfish || echo .venv/bin/goldfish)" demo
