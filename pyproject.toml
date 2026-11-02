@@ -1,0 +1,68 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "goldfish-memory"
+version = "0.1.0"
+description = "On-device persistent memory for AI coding agents: local-first, offline, zero network calls."
+readme = "README.md"
+license = { text = "MIT" }
+authors = [{ name = "Dhanush Nehru" }]
+requires-python = ">=3.10"
+keywords = ["ai-agents", "local-first", "privacy", "memory", "sqlite", "embeddings", "llm", "offline"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries",
+]
+dependencies = [
+    "numpy>=1.24",
+    "sqlite-vec>=0.1.6",
+    "onnxruntime>=1.17",
+    "tokenizers>=0.15",
+]
+
+[project.optional-dependencies]
+sentence-transformers = ["sentence-transformers>=2.2"]
+dev = [
+    "pytest>=8",
+    "pytest-socket>=0.7",
+    "ruff>=0.6",
+    "mypy>=1.10",
+]
+
+[project.urls]
+Homepage = "https://github.com/DhanushNehru/goldfish-memory"
+Issues = "https://github.com/DhanushNehru/goldfish-memory/issues"
+
+[project.scripts]
+goldfish = "goldfish_memory.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/goldfish_memory"]
+
+[tool.ruff]
+target-version = "py310"
+line-length = 100
+src = ["src"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
+
+[tool.mypy]
+python_version = "3.10"
+mypy_path = "src"
+packages = ["goldfish_memory"]
+strict = true
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "--disable-socket"
+markers = ["offline: tests that must pass with all network access blocked"]
