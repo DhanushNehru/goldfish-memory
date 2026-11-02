@@ -37,6 +37,11 @@ dev = [
     "mypy>=1.10",
 ]
 
+docs = [
+    "mkdocs-material",
+    "mkdocstrings[python]",
+]
+
 [project.urls]
 Homepage = "https://github.com/DhanushNehru/goldfish-memory"
 Issues = "https://github.com/DhanushNehru/goldfish-memory/issues"
